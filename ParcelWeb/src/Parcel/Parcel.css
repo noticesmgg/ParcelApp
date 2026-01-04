@@ -1,0 +1,121 @@
+/* App Layout */
+.parcel-app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f6f9;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header */
+.parcel-header {
+    height: 64px;
+    background: linear-gradient(90deg, #1e293b, #334155);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.parcel-header-left h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.parcel-header-left .subtitle {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.parcel-header-right .env {
+    background-color: #16a34a;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Main Content */
+.parcel-content {
+    flex: 1;
+    padding: 24px;
+}
+
+/* Grid polish */
+.dx-datagrid {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.dx-datagrid-headers {
+    background-color: #f1f5f9;
+    font-weight: 600;
+}
+
+.dx-row-alt {
+    background-color: #f8fafc;
+}
+
+.dx-datagrid-search-panel {
+    margin-bottom: 8px;
+}
+
+/* Footer */
+.parcel-footer {
+    height: 44px;
+    background-color: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dx-state-readonly .dx-texteditor-input {
+    background-color: #f5f5f5;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+/* Read-only date box */
+.dx-state-readonly.dx-datebox {
+    background-color: #f5f5f5;
+}
+
+.form-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.child-popup {
+    z-index: 10000 !important;
+}
+
+.dx-datagrid-rowsview .dx-row {
+    height: 35px;
+}
+
+.dx-datagrid-text-content {
+    font-size: 13px;
+}
+
+.dx-datagrid-rowsview .dx-row:hover {
+    background-color: #f5f8fc;
+}
+
+.dx-datagrid-rowsview .dx-selection {
+    background-color: #e8f0fe !important;
+}
+
+.dx-theme-generic-typography {
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.dx-datagrid {
+    border-radius: 8px;
+    background: #fff;
+}

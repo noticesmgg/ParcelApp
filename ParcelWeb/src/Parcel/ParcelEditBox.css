@@ -1,0 +1,85 @@
+/* Popup layout fix */
+.dx-popup-content {
+    box-sizing: border-box;
+}
+
+/* Tabs header */
+.parcel-tabs .dx-tab {
+    font-weight: 500;
+}
+
+/* Active tab indicator */
+.parcel-tabs .dx-tab-selected {
+    border-bottom: 3px solid var(--dx-color-primary);
+}
+
+/* Tab content area */
+.parcel-tabs .dx-multiview-item {
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Form groups */
+.dx-form-group {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Labels */
+.dx-field-item-label-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Remove extra space above footer buttons */
+.dx-popup-content {
+    padding-bottom: 0 !important;
+}
+
+/* Remove spacing under tabs */
+.dx-popup-content .dx-tabpanel {
+    margin-bottom: 0 !important;
+}
+
+/* Remove form bottom margin */
+.parcel-tabs .dx-form {
+    margin-bottom: 0;
+}
+
+/* Ensure tab content is tight */
+.parcel-tabs .dx-multiview-item {
+    padding-bottom: 16px;
+}
+
+.dx-popup-bottom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+}
+
+.dx-popup-bottom .dx-button {
+    min-width: 96px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+
+.upload-tab-content {
+    padding: 20px;
+    min-height: 250px;
+    background: #f5faff;
+    border-radius: 8px;
+}
+
+.upload-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}

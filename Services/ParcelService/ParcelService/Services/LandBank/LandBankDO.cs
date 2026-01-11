@@ -70,4 +70,9 @@ namespace ParcelService.Services.LandBank
 
         }
     }
+
+    public class LandBankUploadResponse
+    { 
+        public bool Success { get; set; }
+    }
 }

@@ -1,4 +1,6 @@
-﻿using SharedCore.DB;
+﻿using ServiceStack;
+using ServiceStack.Web;
+using SharedCore.DB;
 using SharedCore.Utilities;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,53 @@ namespace ParcelService.Services.LandBank
             DataTable dt = Database.Instance.DB.GetRecords(sql);
             return dt.AsEnumerable()
                    .Select(dr => new LandBankDO(dr)).ToArray();
-        }                      
+        }
+
+        public bool Post(LandBankUploads landBankUpload , IHttpFile[]? files)
+        {
+            try
+            {
+                if (files == null || files.Length == 0)
+                    throw HttpError.BadRequest("No files uploaded");
+
+                foreach (var file in files)
+                {
+                    var fileName = file.FileName;
+                    var contentType = file.ContentType;
+                    var stream = file.InputStream;
+
+                    Console.WriteLine($"Received file: {fileName}, {contentType}");
+                    string desPath = "";
+
+                    if (contentType.ContainsIgnoreCase("Image"))
+                    {
+                        desPath = $"{landBankUpload.ParcelNumber}/Images";
+
+                        if (!Directory.Exists(desPath))
+                            Directory.CreateDirectory(desPath);
+                    }
+                    else if (contentType.ContainsIgnoreCase("Video"))
+                    {
+                        desPath = $"{landBankUpload.ParcelNumber}/Videos";
+
+                        if (!Directory.Exists(desPath))
+                            Directory.CreateDirectory(desPath);
+                    }
+                    else
+                        return false;
+
+                    var savePath = Path.Combine(desPath, fileName);
+                    using var fs = File.Create(savePath);
+                    stream.CopyTo(fs);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.ToString());
+                return false;
+            }
+        }
 
         public bool Put(UpdateLandBank landBankDOs)
         {
@@ -46,5 +94,7 @@ namespace ParcelService.Services.LandBank
                 return false;
             }
         }
+
+
     }
 }

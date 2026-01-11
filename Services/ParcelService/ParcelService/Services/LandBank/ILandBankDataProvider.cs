@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServiceStack.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,7 @@ namespace ParcelService.Services.LandBank
         LandBankDO[] Get();
 
         bool Put(UpdateLandBank landBankDOs);
+
+        bool Post(LandBankUploads landBankImages , IHttpFile[]? files);
     }
 }

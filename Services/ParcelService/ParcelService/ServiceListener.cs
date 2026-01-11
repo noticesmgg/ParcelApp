@@ -34,7 +34,7 @@ namespace ParcelService
             public override void Configure(Funq.Container container)
             {
                 JsConfig.DateHandler = DateHandler.ISO8601;
-                JsConfig<DateTime>.SerializeFn = dt => dt.ToString("O"); 
+                JsConfig<DateTime>.SerializeFn = dt => dt.ToString("O");
 
                 SetConfig(new HostConfig { UseCamelCase = false });
 
@@ -49,11 +49,11 @@ namespace ParcelService
                 container.Register<IParcelsDataProvider>(c => new ParcelsDataProvider());
 
                 Plugins.Add(new CorsFeature(
-                   allowedOrigins: "*",
-                   allowedMethods: "GET,POST,PUT,DELETE,OPTIONS,HEAD",
-                   allowedHeaders: "Content-Type, Authorization, Accept, X-Requested-With",
-                   allowCredentials: false
-                   ));
+                    allowedOrigins: "*",
+                    allowedMethods: "GET,POST,PUT,DELETE,OPTIONS,HEAD",
+                    allowedHeaders: "Content-Type, Authorization, Accept, X-Requested-With",
+                    allowCredentials: false
+                ));
 
                 //this.SetConfig(new HostConfig
                 //{

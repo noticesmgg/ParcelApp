@@ -37,4 +37,11 @@ namespace ParcelService.Services.LandBank
         public string Owner { get; set; }
     }
 
+    [Route("/landbank/uploads", "POST")]
+    public class LandBankUploads : IReturn<bool>
+    {
+        public string  ParcelNumber { get; set; }
+
+    }
+
 }

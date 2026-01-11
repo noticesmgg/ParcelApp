@@ -1,0 +1,137 @@
+.register-container {
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    background-image: url("/src/assets/loginpage.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Card */
+.register-card {
+    width: 380px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Titles */
+.register-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.register-subtitle {
+    margin: 6px 0 24px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Fields */
+.register-field {
+    margin-bottom: 16px;
+}
+
+/* Checkbox area */
+.register-actions {
+    margin: 12px 0 20px;
+    font-size: 13px;
+}
+
+/* Error */
+.register-error {
+    background: #fdecea;
+    color: #c0392b;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+/* Footer */
+.register-footer {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.register-footer button {
+    margin-left: 6px;
+    background: none;
+    border: none;
+    color: #1976d2;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+}
+
+.register-footer button:hover {
+    text-decoration: underline;
+}
+
+/* Shared layout (same as login) */
+.auth-left {
+    flex: 1;
+    padding: 80px 100px;
+    color: #ffffff;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-left h1 {
+    font-size: 38px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.auth-left p {
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 420px;
+    opacity: 0.95;
+}
+
+.auth-left ul {
+    margin-top: 32px;
+    padding-left: 0;
+    list-style: none;
+}
+
+.auth-left li {
+    margin-bottom: 14px;
+    font-size: 15px;
+}
+
+.auth-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .register-container {
+        flex-direction: column;
+    }
+
+    .auth-left {
+        display: none;
+    }
+
+    .auth-right {
+        flex: 1;
+    }
+}

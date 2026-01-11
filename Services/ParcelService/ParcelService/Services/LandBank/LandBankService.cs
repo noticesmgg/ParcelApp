@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceStack;
+using ServiceStack.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,15 @@ namespace ParcelService.Services.LandBank
             var result = DataProvider.Put(updateLandBank);
             Console.WriteLine($"Put landbank request completed at {DateTime.Now:HH:mm:ss.fff}");
             return result;
+        }
+
+        public LandBankUploadResponse Post(LandBankUploads landBankImages)
+        {
+            Console.WriteLine($"Post landbank request started at {DateTime.Now:HH:mm:ss.fff}");
+            IHttpFile[]? files = Request?.Files;
+            var result = DataProvider.Post(landBankImages, files);
+            Console.WriteLine($"Post landbank request completed at {DateTime.Now:HH:mm:ss.fff}");
+            return new LandBankUploadResponse { Success = result };
         }
     }
 }

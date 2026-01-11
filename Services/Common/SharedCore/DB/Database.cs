@@ -13,7 +13,7 @@ namespace SharedCore.DB
         public  DataAccess DB { get; set; }
         private string connectionString = "Server=MGG-PR-DB01;Database=DataMart;Trusted_Connection=True;TrustServerCertificate=True";
         private string uatConnectionString = "Server=MGG-UA-DB01;Database=DataMart;Trusted_Connection=True;TrustServerCertificate=True";
-        private string locConnectionString = "Server=DESKTOP-8DFJH8L\\SQLEXPRESS;Database=RAAM;Trusted_Connection=True;TrustServerCertificate=True";
+        private string locConnectionString = "Server=localhost;Database=RAAM;Trusted_Connection=True;TrustServerCertificate=True";
 
         private Database()
         {

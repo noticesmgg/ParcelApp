@@ -402,15 +402,6 @@ export default function ParcelGrid() {
                                         ]
                                     },
                                     {
-                                        title: "Audit Info",
-                                        colCount: 2,
-                                        items: [
-                                            { dataField: "Id", editorOptions: { readOnly: true } },
-                                            { dataField: "ParcelNumber", editorOptions: { readOnly: true } },
-                                            { dataField: "ShortParcel", editorOptions: { readOnly: true } },
-                                        ]
-                                    },
-                                    {
                                         title: "Upload Images and Videos",
                                         colCount: 2,
                                         items: [
@@ -512,7 +503,17 @@ export default function ParcelGrid() {
                                             }
 
                                         ]
-                                    }
+                                    },
+                                    {
+                                        title: "Identifiers",
+                                        colCount: 2,
+                                        items: [
+                                            { dataField: "Id", editorOptions: { readOnly: true } },
+                                            { dataField: "ParcelNumber", editorOptions: { readOnly: true } },
+                                            { dataField: "ShortParcel", editorOptions: { readOnly: true } },
+                                        ]
+                                    },
+                                    
                                 ]
                             }]
                         }}

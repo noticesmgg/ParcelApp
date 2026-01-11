@@ -9,6 +9,7 @@ namespace ParcelService
         {
             Overrides.AppName = "ParcelService";
             Overrides.LogToConsole = true;
+            Overrides.Environment = Overrides.EnvironmentType.Local;
             Logger.Info("Parcel Service is starting up...");
 
             var listener = new ServiceListener();

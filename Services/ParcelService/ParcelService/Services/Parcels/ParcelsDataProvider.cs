@@ -11,21 +11,23 @@ namespace ParcelService.Services.Parcels
 {
     public class ParcelsDataProvider : IParcelsDataProvider
     {
-        public ParcelsDataProvider() 
-        { 
+        public ParcelsDataProvider()
+        {
             Logger.Info("ParcelsDataProvider initialized.");
         }
         public ParcelsDO[] Get()
         {
-			try
-			{
+            try
+            {
                 string sql = "Select * from vw_Parcels";
+                Console.WriteLine($"DB Query started {DateTime.Now}");
                 DataTable dt = Database.Instance.DB.GetRecords(sql);
+                Console.WriteLine($"DB Query ended {DateTime.Now}");
                 return dt.AsEnumerable()
                        .Select(dr => new ParcelsDO(dr)).ToArray();
             }
-			catch (Exception  ex)
-			{
+            catch (Exception ex)
+            {
                 Logger.Error("Error while getting parcels data :", ex);
                 return Array.Empty<ParcelsDO>();
             }

@@ -6,6 +6,16 @@ import { useNavigate } from "react-router-dom";
 import "./Register.css";
 import { Validator, RequiredRule, EmailRule } from "devextreme-react/validator";
 import validationEngine from "devextreme/ui/validation_engine";
+import 'devextreme/dist/css/dx.light.css'
+
+export type RegisterDO = {
+    FullName: string,
+    UserName: string,
+    Email: string,
+    Password: string
+}
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
@@ -18,7 +28,7 @@ const RegisterPage: React.FC = () => {
     const [acceptTerms, setAcceptTerms] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         setError(null);
 
         const result = validationEngine.validateGroup("registerForm");
@@ -41,9 +51,30 @@ const RegisterPage: React.FC = () => {
             return;
         }
 
-        // Call backend register API here
+        const registerPayload: RegisterDO = {
+            FullName: fullName,
+            UserName: username,
+            Email: email,
+            Password: password
+        };
+
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(registerPayload)
+        });
+
+        const resp = await response.json();
+
+        if (!resp.Success) {
+            setError(resp.Message);
+            return;
+        }
 
         navigate("/login");
+
     };
 
     return (

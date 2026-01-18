@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using Microsoft.Extensions.Configuration;
+using ServiceStack;
 using ServiceStack.Web;
 using SharedCore.DB;
 using SharedCore.Utilities;
@@ -13,6 +14,7 @@ namespace ParcelService.Services.LandBank
 {
     public class LandBankDataProvider : ILandBankDataProvider
     {
+        public string connectionString = string.Empty;
         public LandBankDataProvider()
         {
             Logger.Info("LandBankDataProvider invoked");
@@ -27,50 +29,13 @@ namespace ParcelService.Services.LandBank
                    .Select(dr => new LandBankDO(dr)).ToArray();
         }
 
-        public bool Post(LandBankUploads landBankUpload , IHttpFile[]? files)
+        public LandBankDO Get(LandBankRequestById requestById)
         {
-            try
-            {
-                if (files == null || files.Length == 0)
-                    throw HttpError.BadRequest("No files uploaded");
+            string sql = $"Select * from LandBank where Id {requestById.LandBankId}";
 
-                foreach (var file in files)
-                {
-                    var fileName = file.FileName;
-                    var contentType = file.ContentType;
-                    var stream = file.InputStream;
-
-                    Console.WriteLine($"Received file: {fileName}, {contentType}");
-                    string desPath = "";
-
-                    if (contentType.ContainsIgnoreCase("Image"))
-                    {
-                        desPath = $"{landBankUpload.ParcelNumber}/Images";
-
-                        if (!Directory.Exists(desPath))
-                            Directory.CreateDirectory(desPath);
-                    }
-                    else if (contentType.ContainsIgnoreCase("Video"))
-                    {
-                        desPath = $"{landBankUpload.ParcelNumber}/Videos";
-
-                        if (!Directory.Exists(desPath))
-                            Directory.CreateDirectory(desPath);
-                    }
-                    else
-                        return false;
-
-                    var savePath = Path.Combine(desPath, fileName);
-                    using var fs = File.Create(savePath);
-                    stream.CopyTo(fs);
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.ToString());
-                return false;
-            }
+            DataTable dt = Database.Instance.DB.GetRecords(sql);
+            return dt.AsEnumerable()
+                   .Select(dr => new LandBankDO(dr)).First();
         }
 
         public bool Put(UpdateLandBank landBankDOs)
@@ -95,6 +60,68 @@ namespace ParcelService.Services.LandBank
             }
         }
 
+        public  async Task<LandBankUploadResponse> Post(LandBankUploads landBankUpload,IHttpFile[]? files)
+        {
+            var result = new LandBankUploadResponse();
+
+            if (files == null || files.Length == 0)
+                throw HttpError.BadRequest("No files uploaded");
+
+            try
+            {
+                var blobService = new BlobStorageService(connectionString,"landbank-files");
+
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        string fileUrl = await blobService.UploadAsync(file.InputStream,file.FileName,file.ContentType,landBankUpload.LandBankId);
+
+                        bool isSave = SaveFileUrlToDatabase(fileUrl,file.ContentType,landBankUpload.LandBankId.ToSafeInt(),file.FileName);
+
+                        if(isSave)
+                            result.UploadedFilesUrl.Add(fileUrl);
+                        else
+                            result.FailedFiles.Add(file.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"File upload failed: {file.FileName}", ex);
+                        result.FailedFiles.Add(file.FileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Upload process failed", ex);
+            }
+            return result;
+        }
+
+
+        public static bool SaveFileUrlToDatabase(string fileUrl, string mediaType, int landBankId, string fileName)
+        {
+            bool SaveSuccessfully = false;
+            try
+            {
+                string sqlGet = $@"Select * from LB_Media where LandBankId = {landBankId} and FileName = {fileName.ToSQ()} and MediaType ={mediaType.ToSQ()}";
+                DataTable dt = Database.Instance.DB.GetRecords(sqlGet);
+                string sql;
+                if (dt != null && dt.Rows.Count > 0)
+                    sql = @$"Update LB_Media set FileUrl = {fileUrl.ToSQ()} ,UpdatedDate = {DateTime.Now.ToSQ()}, UpdatedBy = {Environment.UserName.ToSQ()} where 
+                            LandBankId = {landBankId} and FileName = {fileName.ToSQ()} and MediaType = {mediaType.ToSQ()}";
+                else
+                    sql = @$"Insert into LB_Media(LandBankId,FileName,FileUrl,MediaType,CreatedDate,CreatedBy) values({landBankId},{fileName.ToSQ()},{fileUrl.ToSQ()},{mediaType.ToSQ()},{DateTime.Now.ToSQ()},{Environment.UserName.ToSQ()})";
+
+                var result = Database.Instance.DB.Execute(sql);
+                SaveSuccessfully = result == 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error while saving image into database" + ex);
+            }
+            return SaveSuccessfully;
+        }
 
     }
 }

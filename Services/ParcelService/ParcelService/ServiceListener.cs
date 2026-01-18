@@ -1,7 +1,9 @@
 ﻿using ParcelService.Services.LandBank;
 using ParcelService.Services.LBApplicationStatus;
 using ParcelService.Services.LBBookmarks;
+using ParcelService.Services.Login;
 using ParcelService.Services.Parcels;
+using ParcelService.Services.Register;
 using ServiceStack;
 using ServiceStack.Text;
 using SharedCore.Utilities;
@@ -47,6 +49,8 @@ namespace ParcelService
                 container.Register<IApplicationStatusDataProvider>(c => new ApplicationStatusDataProvider());
                 container.Register<IBookmarksDataProvider>(c => new BookmarksDataProvider());
                 container.Register<IParcelsDataProvider>(c => new ParcelsDataProvider());
+                container.Register<IRegisterDataProvider>(c => new RegisterDataProvider());
+                container.Register<ILoginDataProvider>(c => new LoginDataProvider());
 
                 Plugins.Add(new CorsFeature(
                     allowedOrigins: "*",

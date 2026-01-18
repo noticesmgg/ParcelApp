@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
     <PackageReference Include="ServiceStack" Version="8.8.0" />
     <PackageReference Include="ServiceStack.Kestrel" Version="8.8.0" />
   </ItemGroup>

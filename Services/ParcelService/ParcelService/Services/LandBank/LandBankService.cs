@@ -20,6 +20,14 @@ namespace ParcelService.Services.LandBank
             return secmaster;
         }
 
+        public LandBankDO Get(LandBankRequestById requestById)
+        {
+            Console.WriteLine($"Get landbank request started at {DateTime.Now:HH:mm:ss.fff}");
+            var secmaster = DataProvider.Get(requestById);
+            Console.WriteLine($"Get landbank request completed at {DateTime.Now:HH:mm:ss.fff}");
+            return secmaster;
+        }
+
         public bool Put(UpdateLandBank updateLandBank)
         {
             Console.WriteLine($"Put landbank request started at {DateTime.Now:HH:mm:ss.fff}");
@@ -28,13 +36,13 @@ namespace ParcelService.Services.LandBank
             return result;
         }
 
-        public LandBankUploadResponse Post(LandBankUploads landBankImages)
+        public async Task<LandBankUploadResponse> Post(LandBankUploads landBankImages)
         {
             Console.WriteLine($"Post landbank request started at {DateTime.Now:HH:mm:ss.fff}");
             IHttpFile[]? files = Request?.Files;
-            var result = DataProvider.Post(landBankImages, files);
+            var result = await DataProvider.Post(landBankImages, files);
             Console.WriteLine($"Post landbank request completed at {DateTime.Now:HH:mm:ss.fff}");
-            return new LandBankUploadResponse { Success = result };
+            return result;
         }
     }
 }

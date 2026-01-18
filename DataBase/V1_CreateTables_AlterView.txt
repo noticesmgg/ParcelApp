@@ -1,0 +1,62 @@
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.tables
+    WHERE name = 'LB_Media'
+)
+BEGIN
+    CREATE TABLE LB_Media (
+        Id INT IDENTITY(1,1),
+        LandBankId INT,
+        FileName VARCHAR(150),
+        MediaType VARCHAR(50),
+        FileUrl VARCHAR(MAX),
+        CreatedDate Datetime ,
+        CreatedBy varchar(20) ,
+        UpdatedDate Datetime ,
+        UpdatedBy varchar(20) ,
+        Primary key (LandBankId,FileName,MediaType)
+    );
+END;
+
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.tables
+    WHERE name = 'LB_Users'
+)
+BEGIN
+    create table LB_Users(Id int identity(1,1),FullName varchar(50),UserName varchar(50),Email varchar(50) primary key, [Password] varchar(50),CreatedDate Datetime,
+    CreatedBy varchar(20) ,UpdatedDate Datetime ,UpdatedBy varchar(20))
+END;
+
+
+CREATE or ALTER VIEW [dbo].[vw_Parcels]  
+AS    
+select l.Id as LandBankId, l.Street, l.City, l.State, l.ZipCode, l.HasDemo, l.Dimensions, b.Notes, l.PermitStatus,  l.LastDateToApply,  
+l.Acreage, l.SquareFoot, l.PropertyStatus, l.PropertyClassification, l.Owner, l.Source, l.ParcelNumber, l.ShortParcel,  
+l.AskingPrice, l.UpdatedAskingPrice,  
+i.Status as IsInterested, s.StatusCode as ApplicationStatus , a.ApplicationNumber, a.AccountId as SubmittedAccount, a.OurBid, a.Competitor, a.WinningBid, a.SubmitDate,a.ReSubmitDate, a.AcceptedDate,  
+b.UpperLimit, b.CompLimit,l.AdDate, l.BidOffDate,  
+ [LandAppraisal]  
+      ,[BuildingAppraisal]  
+      ,[TotalAppraisal]  
+      ,[TotalAssessment]  
+      ,[LandUse]  
+      ,[YearBuilt]  
+      ,[Stories]  
+      ,[TotalRooms]  
+      ,[RecentDateOfSale]  
+      ,[RecentSalesPrice]  
+      ,[SecondRecentDateOfSale]  
+      ,[SecondRecentSalesPrice],  
+ 'https://www.assessormelvinburgess.com/propertyDetails?IR=true&parcelid=' || REGEXP_REPLACE(ShortParcel, N' ', N'%20') AS AccessorLink,  
+ 'https://www.assessormelvinburgess.com/gis?parcelid='|| REGEXP_REPLACE(ShortParcel, N' ', N'%20') AS GisLink,  
+ 'https://gis.register.shelby.tn.us/?parcelid='|| REGEXP_REPLACE(ShortParcel, N' ', N'%20') AS RegistryLink  
+  
+ from   
+LandBank l  
+left join LB_Bookmarks b on l.Id = b.LandBankId  
+left join LB_InterestCodes i on b.InterestId = i.Id  
+left join LB_ApplicationStatus a on a.LandBankId = l.Id  
+left join LB_StatusCodes s on a.StatusCode = s.Id  
+

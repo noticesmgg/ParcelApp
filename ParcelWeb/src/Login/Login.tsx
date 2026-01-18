@@ -5,6 +5,12 @@ import CheckBox from "devextreme-react/check-box";
 import { useNavigate } from "react-router-dom";
 import './Login.css';
 
+export type LoginRequest = {
+    UserName: string,
+    Password: string,
+}
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
@@ -25,16 +31,31 @@ const LoginPage: React.FC = () => {
             return;
         }
 
-
         try {
-            // 🔐 Call backend auth API here
-            // await authService.login(username, password);
+            const request: LoginRequest = {
+                UserName: username,
+                Password: password
+            };
+
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(request)
+            });
+
+            const resp = await response.json();
+
+            if (!resp.Success) {
+                setError(resp.Message);
+                return;
+            }
 
             sessionStorage.setItem("isAuthenticated", "true");
             if (rememberMe) {
                 localStorage.setItem("rememberMe", "true");
             }
-
 
             navigate("/");
         } catch {

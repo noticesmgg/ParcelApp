@@ -135,3 +135,7 @@
         flex: 1;
     }
 }
+
+.dx-toast {
+    z-index: 99999 !important;
+}

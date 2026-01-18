@@ -73,6 +73,7 @@ namespace ParcelService.Services.LandBank
 
     public class LandBankUploadResponse
     { 
-        public bool Success { get; set; }
+        public List<string> UploadedFilesUrl { get; set; } = [];
+        public List<string> FailedFiles { get; set; } = [];
     }
 }

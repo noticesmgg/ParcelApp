@@ -11,8 +11,10 @@ namespace ParcelService.Services.LandBank
     {
         LandBankDO[] Get();
 
+        LandBankDO Get(LandBankRequestById requestById);
+
         bool Put(UpdateLandBank landBankDOs);
 
-        bool Post(LandBankUploads landBankImages , IHttpFile[]? files);
+        Task<LandBankUploadResponse> Post(LandBankUploads landBankImages , IHttpFile[]? files);
     }
 }

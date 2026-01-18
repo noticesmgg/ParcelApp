@@ -1,4 +1,4 @@
-import DataGrid, { Column, Paging, Pager, FilterRow, SearchPanel, Sorting, Editing, Summary, TotalItem, ColumnChooser, StateStoring, Position, ColumnChooserSearch, ColumnChooserSelection, Scrolling, Toolbar, Item, HeaderFilter, LoadPanel } from "devextreme-react/data-grid";
+import DataGrid, { Column, Paging, Pager, FilterRow, SearchPanel, Sorting, Editing, Summary, TotalItem, ColumnChooser, StateStoring, Position, ColumnChooserSearch, ColumnChooserSelection, Scrolling, Toolbar, Item, HeaderFilter, LoadPanel, type DataGridTypes } from "devextreme-react/data-grid";
 import CustomStore from "devextreme/data/custom_store";
 import "devextreme/dist/css/dx.light.css";
 import "./Parcel.css";
@@ -11,12 +11,6 @@ import HeaderProfile from "../Profile/Profile";
 import type { GroupItemTemplateData } from "devextreme/ui/form";
 import type { DxElement } from "devextreme/core/element";
 
-
-
-
-
-
-
 const baseOptions = {
     displayTime: 2000,
     position: {
@@ -28,95 +22,84 @@ const baseOptions = {
     width: 300
 };
 
-export type ParcelDO = {
-    Id?: number | null;
-    ParcelNumber: string;
-    ShortParcel: string;
-    Street: string;
-    City: string;
-    State: string;
-    ZipCode?: number | null;
-    AskingPrice?: number | null;
-    UpdatedAskingPrice?: number | null;
-    AdDate?: Date | string | null;
-    BidOffDate?: Date | string | null;
-    LastDateToApply?: Date | string | null;
-    Acreage?: number | null;
-    SquareFoot?: number | null;
-    Dimensions: string;
-    HasDemo?: boolean | null;
-    PermitStatus: string;
-    PropertyStatus: string;
-    PropertyClassification: string;
-    Source: string;
-    Owner: string;
-    CreatedDate?: Date | string | null;
-    UpdatedDate?: Date | string | null;
-    CreatedBy: string;
-    UpdatedBy: string;
-};
-
-export type ApplicationStatusDO = {
-    Id?: number | null;
-    LandBankId?: number | null;
-    AccountId: string;
+export interface ParcelsDO {
+    LandBankId: number;
+    Street?: string;
+    City?: string;
+    State?: string;
+    ZipCode?: number;
+    HasDemo?: boolean;
+    Dimensions?: string;
+    Notes?: string;
+    PermitStatus?: string;
+    LastDateToApply?: Date | string;
+    Acreage?: number;
+    SquareFoot?: number;
+    PropertyStatus?: string;
+    PropertyClassification?: string;
+    Owner?: string;
+    Source?: string;
+    ParcelNumber?: string;
+    ShortParcel?: string;
+    AskingPrice?: number;
+    UpdatedAskingPrice?: number;
+    IsInterested?: string;
+    ApplicationStatus?: string;
+    ApplicationNumber?: string;
+    SubmittedAccount?: string;
+    OurBid?: number;
+    Competitor?: string;
+    WinningBid?: number;
     SubmitDate?: Date | string | null;
-    ReSubmitDate?: Date | string | null;
     AcceptedDate?: Date | string | null;
-    ApplicationNumber: string;
-    Status: string;
-    OurBid?: number | null;
-    Competitor: string;
-    WinningBid?: number | null;
-    CreatedDate?: Date | string | null;
-    UpdatedDate?: Date | string | null;
-    CreatedBy: string;
-    UpdatedBy: string;
-};
+    UpperLimit?: number;
+    CompLimit?: string;
+    AdDate?: Date | string;
+    BidOffDate?: Date | string;
+    LandAppraisal?: number;
+    BuildingAppraisal?: number;
+    TotalAppraisal?: number;
+    TotalAssessment?: number;
+    LandUse?: string;
+    YearBuilt?: number;
+    Stories?: number;
+    TotalRooms?: number;
+    RecentDateOfSale?: Date | string | null;
+    RecentSalesPrice?: number;
+    SecondRecentDateOfSale?: Date | string | null;
+    SecondRecentSalesPrice?: number;
+    AccessorLink?: string;
+    GisLink?: string;
+    RegistryLink?: string;
+}
 
-export type BookmarkDO = {
-    Id?: number | null;
-    LandBankId?: number | null;
-    Interest: string;
-    UpperLimit?: number | null;
-    CompLimit: string;
-    Notes: string;
-    CreatedDate?: Date | string | null;
-    UpdatedDate?: Date | string | null;
-    CreatedBy: string;
-    UpdatedBy: string;
-};
-
-type ParcelEditModel = {
-    Parcel?: ParcelDO;
-    Bookmark?: BookmarkDO;
-    ApplicationStatus?: ApplicationStatusDO;
-};
-
+export interface ParcelMedia {
+    ImagesUrl: string[];
+    VideosUrl: string[];
+}
 
 const API_URL = import.meta.env.VITE_API_URL;
-let parcelCache: ParcelDO[] = [];
+let parcelCache: ParcelsDO[] = [];
 
-const parcelStore = new CustomStore<ParcelDO, number>({
-    key: "Id",
+const parcelStore = new CustomStore<ParcelsDO, number>({
+    key: "LandBankId",
     load: async () => {
         if (parcelCache.length > 0) {
             return parcelCache;
         }
-        console.log(import.meta.env.VITE_ENV)
-        const response = await fetch(`${API_URL}/landbank?format=json`);
+        const response = await fetch(`${API_URL}/parcels?format=json`);
         if (!response.ok) throw new Error("Failed to load parcels");
         const data = await response.json();
         parcelCache = data;
         return data;
     },
     byKey: async (key) => {
-        const parcel = parcelCache.find(p => p.Id === key);
+        const parcel = parcelCache.find(p => p.LandBankId === key);
         if (!parcel) throw new Error("Parcel not found");
         return parcel;
     },
     update: async (key, values) => {
-        const index = parcelCache.findIndex(p => p.Id === key);
+        const index = parcelCache.findIndex(p => p.LandBankId === key);
         if (index === -1) {
             notify("Record not found", "error", 3000);
             throw new Error("Record not found");
@@ -164,7 +147,7 @@ const parcelStore = new CustomStore<ParcelDO, number>({
 
             if (!response.ok) throw new Error("Delete failed");
 
-            parcelCache = parcelCache.filter(p => p.Id !== key);
+            parcelCache = parcelCache.filter(p => p.LandBankId !== key);
 
             notify({ ...baseOptions, message: "Parcel deleted", type: "success" });
         } catch (err) {
@@ -176,10 +159,12 @@ const parcelStore = new CustomStore<ParcelDO, number>({
 
 export default function ParcelGrid() {
 
-    const gridRef = useRef<dxDataGrid<ParcelDO, number> | undefined>(null);
-    const [editingRow, setEditingRow] = useState<ParcelEditModel>();
+    const gridRef = useRef<dxDataGrid<ParcelsDO, number> | undefined>(null);
+    const [editingRow, setEditingRow] = useState<ParcelsDO>();
     const imageInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+    const [hasDemoOn, setHasDemoOn] = useState(false);
+    const [todayOn, setTodayOn] = useState(false);
 
 
     const OnRowDoubleClick = (e: RowDblClickEvent) => {
@@ -188,36 +173,80 @@ export default function ParcelGrid() {
         gridRef.current?.editRow(e.rowIndex);
     }
 
-    const OnEditingStart = async (e: EditingStartEvent<ParcelDO, number>) => {
-        const parcel = e.data as ParcelDO;
+    const OnEditingStart = async (e: EditingStartEvent<ParcelsDO, number>) => {
+        const parcel = e.data as ParcelsDO;
+        setEditingRow(parcel);
+    }
 
-        const editModel: ParcelEditModel = {
-            Parcel: parcel
-        };
+    const applyFilters = (hasDemo: boolean, today: boolean) => {
+        const filters = [];
 
-        try {
-            const bookmarkRes = await fetch(
-                `${API_URL}/lbbookmarks/?format=json&LandBankId=${parcel.Id}`
-            );
-            if (bookmarkRes.ok) {
-                editModel.Bookmark = await bookmarkRes.json();
-            }
-        } catch {
-            notify({ ...baseOptions, message: "Failed to load bookmark", type: "error" });
+        if (hasDemo) {
+            filters.push(["HasDemo", "=", true]);
         }
 
-        try {
-            const appRes = await fetch(
-                `${API_URL}/lbapplicationstatus/?format=json&LandBankId=${parcel.Id}`
-            );
-            if (appRes.ok) {
-                editModel.ApplicationStatus = await appRes.json();
+        if (today) {
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+
+            const end = new Date();
+            end.setHours(23, 59, 59, 999);
+
+            const dateFilter = [
+                ["LastDateToApply", ">=", start],
+                "and",
+                ["LastDateToApply", "<=", end]
+            ];
+
+            if (filters.length) {
+                filters.push("and", dateFilter);
+            } else {
+                filters.push(dateFilter);
             }
-        } catch {
-            notify({ ...baseOptions, message: "Failed to load application status", type: "error" });
         }
 
-        setEditingRow(editModel);
+        if (filters.length) {
+            gridRef.current?.filter(filters);
+        } else {
+            gridRef.current?.clearFilter();
+        }
+    };
+
+
+
+    const onToolbarPreparing = (e: DataGridTypes.ToolbarPreparingEvent) => {
+        e.toolbarOptions.items?.unshift(
+            {
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    text: "Has Demo",
+                    icon: "check",
+                    type: hasDemoOn ? "default" : "normal",
+                    stylingMode: hasDemoOn ? "contained" : "outlined",
+                    onClick: () => {
+                        const next = !hasDemoOn;
+                        setHasDemoOn(next);
+                        applyFilters(next, todayOn);
+                    }
+                }
+            },
+            {
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    text: "Last Apply Date",
+                    icon: "event",
+                    type: todayOn ? "default" : "normal",
+                    stylingMode: todayOn ? "contained" : "outlined",
+                    onClick: () => {
+                        const next = !todayOn;
+                        setTodayOn(next);
+                        applyFilters(hasDemoOn, next);
+                    }
+                }
+            }
+        );
     }
 
     const Images = [
@@ -283,6 +312,7 @@ export default function ParcelGrid() {
                     columnHidingEnabled={false}
                     onRowDblClick={OnRowDoubleClick}
                     onEditingStart={OnEditingStart}
+                    onToolbarPreparing={onToolbarPreparing}
                 >
                     <Toolbar>
                         <Item name="searchPanel" location="before" />
@@ -310,8 +340,8 @@ export default function ParcelGrid() {
                         allowDeleting={false}
                         allowAdding={false}
                         popup={{
-                            title: editingRow?.Parcel?.Street
-                                ? `Edit Parcel — ${editingRow.Parcel.Street}`
+                            title: editingRow?.Street
+                                ? `Edit Parcel — ${editingRow.Street}`
                                 : "Edit Parcel",
                             showTitle: true,
                             width: 720,
@@ -346,56 +376,70 @@ export default function ParcelGrid() {
                                         title: "Parcel Info",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "Parcel.Street" },
-                                            { dataField: "Parcel.City" },
-                                            { dataField: "Parcel.State" },
-                                            { dataField: "Parcel.ZipCode" },
-                                            { dataField: "Parcel.AskingPrice", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
-                                            { dataField: "Parcel.UpdatedAskingPrice", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
-                                            { dataField: "Parcel.Acreage" },
-                                            { dataField: "Parcel.SquareFoot" },
-                                            { dataField: "Parcel.Dimensions" },
-                                            { dataField: "Parcel.Source" },
-                                            { dataField: "Parcel.Owner" }
+                                            { dataField: "Street" },
+                                            { dataField: "City" },
+                                            { dataField: "State" },
+                                            { dataField: "ZipCode" },
+                                            { dataField: "AskingPrice", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
+                                            { dataField: "UpdatedAskingPrice", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
+                                            { dataField: "Acreage" },
+                                            { dataField: "SquareFoot" },
+                                            { dataField: "Dimensions" },
+                                            { dataField: "Source" },
+                                            { dataField: "Owner" }
+                                        ]
+                                    },
+                                    {
+                                        title: "Pricing",
+                                        colCount: 2,
+                                        items: [
+                                            { dataField: "LandAppraisal" },
+                                            { dataField: "BuildingAppraisal" },
+                                            { dataField: "TotalAppraisal" },
+                                            { dataField: "TotalAssessment" },
+                                            { dataField: "LandUse" },
+                                            { dataField: "YearBuilt" },
+                                            { dataField: "Stories" },
+                                            { dataField: "TotalRooms" },
+                                            { dataField: "RecentDateOfSale" },
+                                            { dataField: "RecentSalesPrice" },
+                                            { dataField: "SecondRecentDateOfSale" },
+                                            { dataField: "SecondRecentSalesPrice" }
                                         ]
                                     },
                                     {
                                         title: "Dates & Status",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "Parcel.AdDate", editorType: "dxDateBox" },
-                                            { dataField: "Parcel.BidOffDate", editorType: "dxDateBox" },
-                                            { dataField: "Parcel.LastDateToApply", editorType: "dxDateBox" },
-                                            { dataField: "Parcel.HasDemo" },
-                                            { dataField: "Parcel.PermitStatus" },
-                                            { dataField: "Parcel.PropertyStatus" },
-                                            { dataField: "Parcel.PropertyClassification" },
+                                            { dataField: "AdDate", editorType: "dxDateBox" },
+                                            { dataField: "BidOffDate", editorType: "dxDateBox" },
+                                            { dataField: "LastDateToApply", editorType: "dxDateBox" },
+                                            { dataField: "HasDemo" },
+                                            { dataField: "PermitStatus" },
+                                            { dataField: "PropertyStatus" },
+                                            { dataField: "PropertyClassification" },
                                         ]
                                     },
                                     {
                                         title: "Bookmark Status",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "Bookmark.Id", editorType: "dxNumberBox", editorOptions: { readOnly: true } },
-                                            { dataField: "Bookmark.LandBankId", editorType: "dxNumberBox", editorOptions: { readOnly: true } },
-                                            { dataField: "Bookmark.Interest", editorType: "dxSelectBox", editorOptions: { items: ["Yes", "No", "Conditional", "Pending", "Ignore"] } },
-                                            { dataField: "Bookmark.UpperLimit", editorType: "dxNumberBox" },
-                                            { dataField: "Bookmark.CompLimit", editorType: "dxTextBox" },
-                                            { dataField: "Bookmark.Notes", editorType: "dxTextBox" },
+                                            { dataField: "IsInterested", editorType: "dxSelectBox", editorOptions: { items: ["Yes", "No", "Conditional", "Pending", "Ignore"] } },
+                                            { dataField: "UpperLimit", editorType: "dxNumberBox", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
+                                            { dataField: "CompLimit", editorType: "dxTextBox", editorOptions: { format: { type: "currency", precision: 0 }, stylingMode: "outlined" } },
+                                            { dataField: "Notes", editorType: "dxTextBox" },
                                         ]
                                     },
                                     {
                                         title: "Application Status",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "ApplicationStatus.Id", editorType: "dxNumberBox", editorOptions: { readOnly: true } },
-                                            { dataField: "ApplicationStatus.LandBankId", editorType: "dxNumberBox", editorOptions: { readOnly: true } },
-                                            { dataField: "ApplicationStatus.AccountId", editorType: "dxTextBox", },
-                                            { dataField: "ApplicationStatus.SubmitDate", editorType: "dxDateBox", },
-                                            { dataField: "ApplicationStatus.ReSubmitDate", editorType: "dxDateBox", },
-                                            { dataField: "ApplicationStatus.AcceptedDate", editorType: "dxDateBox", },
-                                            { dataField: "ApplicationStatus.ApplicationNumber", editorType: "dxTextBox", },
-                                            { dataField: "Status", editorType: "dxSelectBox", editorOptions: { items: ["Bid Submitted", "Bid Accepted", "Pending", "Reverted", "Re-Submitted", "Accepted", "Bid Lost", "Bid Won"], stylingMode: "outlined" } },
+                                            { dataField: "SubmittedAccount", editorType: "dxTextBox", },
+                                            { dataField: "SubmitDate", editorType: "dxDateBox", },
+                                            { dataField: "ReSubmitDate", editorType: "dxDateBox", },
+                                            { dataField: "AcceptedDate", editorType: "dxDateBox", },
+                                            { dataField: "ApplicationNumber", editorType: "dxTextBox", },
+                                            { dataField: "ApplicationStatus", editorType: "dxSelectBox", editorOptions: { items: ["Bid Submitted", "Bid Accepted", "Pending", "Reverted", "Re-Submitted", "Accepted", "Bid Lost", "Bid Won"], stylingMode: "outlined" } },
                                             { dataField: "OurBid", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
                                             { dataField: "Competitor", editorType: "dxTextBox", },
                                             { dataField: "WinningBid", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
@@ -508,43 +552,66 @@ export default function ParcelGrid() {
                                         title: "Identifiers",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "Id", editorOptions: { readOnly: true } },
+                                            { dataField: "LandBankId", editorOptions: { readOnly: true } },
                                             { dataField: "ParcelNumber", editorOptions: { readOnly: true } },
                                             { dataField: "ShortParcel", editorOptions: { readOnly: true } },
                                         ]
                                     },
-                                    
+
                                 ]
                             }]
                         }}
                     />
 
-
-                    <Column dataField="Id" visible={false} allowEditing={false} dataType="number" caption="ID" />
-                    <Column dataField="ParcelNumber" caption="Parcel #" allowEditing={false} fixed fixedPosition="left" width={150} />
-                    <Column dataField="ShortParcel" caption="Short Parcel" fixed fixedPosition="left" width={150} />
-                    <Column dataField="Street" width={200} />
-                    <Column dataField="City" width={100} />
-                    <Column dataField="State" width={80} />
-                    <Column dataField="ZipCode" caption="ZIP" width={100} />
-                    <Column dataField="AskingPrice" caption="Asking Price" dataType="number" format="currency" width={150} />
-                    <Column dataField="UpdatedAskingPrice" caption="Updated Asking Price" dataType="number" format="currency" width={200} />
-                    <Column dataField="AdDate" caption="Ad Date" dataType="date" width={150} />
-                    <Column dataField="BidOffDate" caption="Bid Off Date" dataType="date" width={150} />
-                    <Column dataField="LastDateToApply" caption="Last Apply Date" dataType="date" width={150} />
+                    <Column dataField="LandBankId" caption="ID" dataType="number" width={80} visible={false} />
+                    <Column dataField="Street" caption="Street" dataType="string" width={200} />
+                    <Column dataField="City" caption="City" dataType="string" width={120} />
+                    <Column dataField="State" caption="State" dataType="string" width={80} />
+                    <Column dataField="ZipCode" caption="Zip Code" dataType="number" width={100} />
+                    <Column dataField="HasDemo" caption="Has Demo" dataType="boolean" width={100} />
+                    <Column dataField="Dimensions" caption="Dimensions" dataType="string" width={150} />
+                    <Column dataField="Notes" caption="Notes" dataType="string" width={250} />
+                    <Column dataField="PermitStatus" caption="Permit Status" dataType="string" width={140} />
+                    <Column dataField="LastDateToApply" caption="Last Date To Apply" dataType="date" width={150} />
                     <Column dataField="Acreage" caption="Acreage" dataType="number" width={100} />
-                    <Column dataField="SquareFoot" caption="Sq Ft" dataType="number" width={100} />
-                    <Column dataField="Dimensions" width={240} />
-                    <Column dataField="HasDemo" caption="Has Demo" dataType="boolean" width={120} />
-                    <Column dataField="PermitStatus" caption="Permit Status" width={120} />
-                    <Column dataField="PropertyStatus" caption="Status" width={100} />
-                    <Column dataField="PropertyClassification" caption="Classification" width={150} />
-                    <Column dataField="Source" width={150} />
-                    <Column dataField="Owner" width={150} />
-                    <Column dataField="CreatedDate" caption="Created" dataType="datetime" visible={false} allowEditing={false} />
-                    <Column dataField="UpdatedDate" caption="Updated" dataType="datetime" visible={false} allowEditing={false} />
-                    <Column dataField="CreatedBy" visible={false} allowEditing={false} />
-                    <Column dataField="UpdatedBy" visible={false} allowEditing={false} />
+                    <Column dataField="SquareFoot" caption="Square Foot" dataType="number" width={120} />
+                    <Column dataField="PropertyStatus" caption="Property Status" dataType="string" width={150} />
+                    <Column dataField="PropertyClassification" caption="Property Classification" dataType="string" width={200} />
+                    <Column dataField="Owner" caption="Owner" dataType="string" width={200} />
+                    <Column dataField="Source" caption="Source" dataType="string" width={120} />
+                    <Column dataField="ParcelNumber" caption="Parcel Number" dataType="string" width={160} fixed fixedPosition="left" />
+                    <Column dataField="ShortParcel" caption="Short Parcel" dataType="string" width={140} fixed fixedPosition="left" />
+                    <Column dataField="AskingPrice" caption="Asking Price" dataType="number" format="currency" width={130} />
+                    <Column dataField="UpdatedAskingPrice" caption="Updated Asking Price" dataType="number" format="currency" width={170} />
+                    <Column dataField="IsInterested" caption="Interested" dataType="string" width={120} />
+                    <Column dataField="ApplicationStatus" caption="Application Status" dataType="string" width={160} />
+                    <Column dataField="ApplicationNumber" caption="Application Number" dataType="string" width={170} />
+                    <Column dataField="SubmittedAccount" caption="Submitted Account" dataType="string" width={160} />
+                    <Column dataField="OurBid" caption="Our Bid" dataType="number" format="currency" width={120} />
+                    <Column dataField="Competitor" caption="Competitor" dataType="string" width={140} />
+                    <Column dataField="WinningBid" caption="Winning Bid" dataType="number" format="currency" width={130} />
+                    <Column dataField="SubmitDate" caption="Submit Date" dataType="date" width={130} />
+                    <Column dataField="ReSubmitDate" caption="ReSubmit Date" dataType="date" width={130} />
+                    <Column dataField="AcceptedDate" caption="Accepted Date" dataType="date" width={150} />
+                    <Column dataField="UpperLimit" caption="Upper Limit" dataType="number" format="currency" width={130} />
+                    <Column dataField="CompLimit" caption="Comp Limit" dataType="string" width={120} />
+                    <Column dataField="AdDate" caption="Ad Date" dataType="date" width={120} />
+                    <Column dataField="BidOffDate" caption="Bid Off Date" dataType="date" width={140} />
+                    <Column dataField="LandAppraisal" caption="Land Appraisal" dataType="number" width={130} />
+                    <Column dataField="BuildingAppraisal" caption="Building Appraisal" dataType="number" width={150} />
+                    <Column dataField="TotalAppraisal" caption="Total Appraisal" dataType="number" width={150} />
+                    <Column dataField="TotalAssessment" caption="TotalAssessment" dataType="number" width={150} />
+                    <Column dataField="LandUse" caption="Land Use" dataType="string" width={150} />
+                    <Column dataField="YearBuilt" caption="Year Built" dataType="number" width={100} />
+                    <Column dataField="Stories" caption="Stories" dataType="number" width={100} />
+                    <Column dataField="TotalRooms" caption="Total Rooms" dataType="number" width={120} />
+                    <Column dataField="RecentDateOfSale" caption="Recent Date Of Sale" dataType="date" width={150} />
+                    <Column dataField="RecentSalesPrice" caption="Recent Sales Price" dataType="number" width={150} />
+                    <Column dataField="SecondRecentDateOfSale" caption="Second Recent Date Of Sale" dataType="date" width={200} />
+                    <Column dataField="SecondRecentSalesPrice" caption="Second Recent Sales Price" dataType="number" width={200} />
+                    <Column dataField="AccessorLink" caption="Accessor Link" dataType="string" width={200} />
+                    <Column dataField="GisLink" caption="GIS Link" dataType="string" width={200} />
+                    <Column dataField="RegistryLink" caption="Registry Link" dataType="string" width={200} />
                     <Summary >
                         <TotalItem
                             column="Acreage"
@@ -572,60 +639,65 @@ export default function ParcelGrid() {
                 multiple
                 style={{ display: "none" }}
                 onChange={async (e) => {
+                    try {
+                        const filesType = Array.from(e.target.files || []);
+                        const imagesOnly = filesType.filter(file =>
+                            file.type.startsWith("image/")
+                        );
 
-                    const filesType = Array.from(e.target.files || []);
-                    const imagesOnly = filesType.filter(file =>
-                        file.type.startsWith("image/")
-                    );
-
-                    if (imagesOnly.length !== filesType.length) {
-                        notify({
-                            ...baseOptions,
-                            message: "Only image files are allowed",
-                            type: "error"
-                        });
-                        e.target.value = "";
-                        return;
-                    }
-
-                    const files = e.target.files;
-                    if (!files) return;
-
-                    const formData = new FormData();
-                    Array.from(files).forEach(f => formData.append("files", f));
-
-                    const parcelNumber = editingRow?.Parcel?.ParcelNumber;
-                    if (parcelNumber) {
-                        formData.append("ParcelNumber", parcelNumber);
-                    }
-
-                    const response = await fetch(`${API_URL}/landbank/uploads`, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "Accept": "application/json"
+                        if (imagesOnly.length !== filesType.length) {
+                            notify({
+                                ...baseOptions,
+                                message: "Only image files are allowed",
+                                type: "error"
+                            });
+                            return;
                         }
-                    });
 
-                    if (!response.ok) {
-                        throw new Error("Upload failed");
-                    }
+                        const files = e.target.files;
+                        if (!files) return;
 
-                    const result = await response.json();
+                        const formData = new FormData();
+                        Array.from(files).forEach(f => formData.append("files", f));
 
-                    if (!result.Success) {
+                        const landBankId = editingRow?.LandBankId;
+                        if (landBankId) {
+                            formData.append("LandBankId", landBankId.toString());
+                        }
+
+                        const response = await fetch(`${API_URL}/landbank/uploads`, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error("Upload failed");
+                        }
+
+                        const result = await response.json();
+
                         notify({
                             ...baseOptions,
-                            message: "Images upload failed",
+                            message: result.FailedFiles.length === 0
+                                ? "Images uploaded successfully"
+                                : "Images upload failed",
+                            type: result.FailedFiles.length === 0 ? "success" : "error"
+                        });
+                    }
+                    catch (err) {
+                        console.error(err);
+                        notify({
+                            ...baseOptions,
+                            message: "Upload failed",
                             type: "error"
                         });
                     }
-                    else {
-                        notify({
-                            ...baseOptions,
-                            message: "Images uploaded successfully",
-                            type: "success"
-                        });
+                    finally {
+                        imageInputRef.current!.value = "";
+                        e.target.value = "";
                     }
                 }}
             />
@@ -637,64 +709,68 @@ export default function ParcelGrid() {
                 multiple
                 style={{ display: "none" }}
                 onChange={async (e) => {
+                    try {
+                        const filesType = Array.from(e.target.files || []);
+                        const videosOnly = filesType.filter(file =>
+                            file.type.startsWith("video/")
+                        );
 
-                    const filesType = Array.from(e.target.files || []);
-                    const imagesOnly = filesType.filter(file =>
-                        file.type.startsWith("video/")
-                    );
-
-                    if (imagesOnly.length !== filesType.length) {
-                        notify({
-                            ...baseOptions,
-                            message: "Only video files are allowed",
-                            type: "error"
-                        });
-                        e.target.value = "";
-                        return;
-                    }
-
-                    const files = e.target.files;
-                    if (!files) return;
-
-                    const formData = new FormData();
-                    Array.from(files).forEach(f => formData.append("files", f));
-
-                    const parcelNumber = editingRow?.Parcel?.ParcelNumber;
-                    if (parcelNumber) {
-                        formData.append("ParcelNumber", parcelNumber);
-                    }
-
-                    const response = await fetch(`${API_URL}/landbank/uploads`, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "Accept": "application/json"
+                        if (videosOnly.length !== filesType.length) {
+                            notify({
+                                ...baseOptions,
+                                message: "Only video files are allowed",
+                                type: "error"
+                            });
+                            return;
                         }
-                    });
 
-                    if (!response.ok) {
-                        throw new Error("Upload failed");
-                    }
+                        const files = e.target.files;
+                        if (!files) return;
 
-                    const result = await response.json();
+                        const formData = new FormData();
+                        Array.from(files).forEach(f => formData.append("files", f));
 
-                    if (!result.Success) {
+                        const parcelNumber = editingRow?.ParcelNumber;
+                        if (parcelNumber) {
+                            formData.append("ParcelNumber", parcelNumber);
+                        }
+
+                        const response = await fetch(`${API_URL}/landbank/uploads`, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error("Upload failed");
+                        }
+
+                        const result = await response.json();
+
                         notify({
                             ...baseOptions,
-                            message: "Videos upload failed",
+                            message: result.FailedFiles.length === 0
+                                ? "Videos uploaded successfully"
+                                : "Videos upload failed",
+                            type: result.FailedFiles.length === 0 ? "success" : "error"
+                        });
+                    }
+                    catch (err) {
+                        console.error(err);
+                        notify({
+                            ...baseOptions,
+                            message: "Video upload failed",
                             type: "error"
                         });
                     }
-                    else {
-                        notify({
-                            ...baseOptions,
-                            message: "Videos uploaded successfully",
-                            type: "success"
-                        });
+                    finally {
+                        e.target.value = "";
+                        videoInputRef.current!.value = "";
                     }
                 }}
             />
-
         </div>
     );
 }

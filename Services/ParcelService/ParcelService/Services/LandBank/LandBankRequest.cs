@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace ParcelService.Services.LandBank
 {
-    [Route("/landbank", "GET POST")]
+    [Route("/landbank", "GET")]
     public class LandBankRequest : IReturn<LandBankDO[]>
     {
+    }
+
+    [Route("/landbankbyid","GET")]
+    public class LandBankRequestById : IReturn<LandBankDO>
+    {
+        public int LandBankId { get; set; }
     }
 
     [Route("/landbank/{Id}", "PUT")]
@@ -40,7 +46,7 @@ namespace ParcelService.Services.LandBank
     [Route("/landbank/uploads", "POST")]
     public class LandBankUploads : IReturn<bool>
     {
-        public string  ParcelNumber { get; set; }
+        public string  LandBankId { get; set; }
 
     }
 

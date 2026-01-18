@@ -206,7 +206,7 @@ export default function ParcelGrid() {
         }
 
         if (filters.length) {
-            gridRef.current?.filter(filters);
+            gridRef.current?.option("filterValue", filters);
         } else {
             gridRef.current?.clearFilter();
         }

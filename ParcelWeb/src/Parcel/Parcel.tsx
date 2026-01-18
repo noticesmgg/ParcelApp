@@ -210,8 +210,8 @@ export default function ParcelGrid() {
     const OnRowPrepared = (e: RowPreparedEvent<ParcelsDO, number>) => {
         if (e.rowType !== "data") return;
 
-         e.rowElement.style.backgroundColor = "";
-         e.rowElement.style.fontWeight = "";
+        e.rowElement.style.backgroundColor = "";
+        e.rowElement.style.fontWeight = "";
 
         const parcel = e.data as ParcelsDO;
 
@@ -225,7 +225,7 @@ export default function ParcelGrid() {
             e.rowElement.style.backgroundColor = "#FBE2D5"; // light orange
             //e.rowElement.style.fontWeight = "600"; // optional
         }
-        };
+    };
 
     const onToolbarPreparing = (e: DataGridTypes.ToolbarPreparingEvent) => {
         e.toolbarOptions.items?.unshift(
@@ -400,25 +400,97 @@ export default function ParcelGrid() {
                                             { dataField: "SquareFoot" },
                                             { dataField: "Dimensions" },
                                             { dataField: "Source" },
-                                            { dataField: "Owner" }
+                                            { dataField: "Owner" },
+                                            {},
+                                            {
+                                                dataField: "AccessorLink",
+                                                label: { text: "Accessor Link" },
+                                                template: (data: GroupItemTemplateData, itemElement: DxElement) => {
+                                                    const formData = data.component.option("formData");
+                                                    const link = formData?.AccessorLink;
+                                                    if (!link) return;
+                                                    const a = document.createElement("a");
+                                                    a.href = link;
+                                                    a.target = "_blank";
+                                                    a.rel = "noopener noreferrer";
+                                                    a.textContent = "Open Assessor";
+                                                    a.style.color = "#1976d2";
+                                                    a.style.textDecoration = "underline";
+                                                    a.style.cursor = "pointer";
+                                                    itemElement.append(a);
+                                                }
+                                            },
+                                            {
+                                                dataField: "GisLink",
+                                                label: { text: "Gis Link" },
+                                                template: (data: GroupItemTemplateData, itemElement: DxElement) => {
+                                                    const formData = data.component.option("formData");
+                                                    const link = formData?.GisLink;
+                                                    if (!link) return;
+                                                    const a = document.createElement("a");
+                                                    a.href = link;
+                                                    a.target = "_blank";
+                                                    a.rel = "noopener noreferrer";
+                                                    a.textContent = "Open Gis";
+                                                    a.style.color = "#1976d2";
+                                                    a.style.textDecoration = "underline";
+                                                    a.style.cursor = "pointer";
+                                                    itemElement.append(a);
+                                                }
+                                            },
+                                            {
+                                                dataField: "RegistryLink",
+                                                label: { text: "Registry Link" },
+                                                template: (data: GroupItemTemplateData, itemElement: DxElement) => {
+                                                    const formData = data.component.option("formData");
+                                                    const link = formData?.RegistryLink;
+                                                    if (!link) return;
+                                                    const a = document.createElement("a");
+                                                    a.href = link;
+                                                    a.target = "_blank";
+                                                    a.rel = "noopener noreferrer";
+                                                    a.textContent = "Open Registry";
+                                                    a.style.color = "#1976d2";
+                                                    a.style.textDecoration = "underline";
+                                                    a.style.cursor = "pointer";
+                                                    itemElement.append(a);
+                                                }
+                                            },
+                                            {
+                                                label: { text: "Google Map Link" },
+                                                template: (data: GroupItemTemplateData, itemElement: DxElement) => {
+                                                    const formData = data.component.option("formData");
+                                                    const link = formData?.Street + ", " + formData?.City + ", " + formData?.State + ", " + formData?.ZipCode;
+                                                    if (!link) return;
+                                                    const a = document.createElement("a");
+                                                    a.href = "https://www.google.com/maps/place/" + link;
+                                                    a.target = "_blank";
+                                                    a.rel = "noopener noreferrer";
+                                                    a.textContent = "Open Map";
+                                                    a.style.color = "#1976d2";
+                                                    a.style.textDecoration = "underline";
+                                                    a.style.cursor = "pointer";
+                                                    itemElement.append(a);
+                                                }
+                                            }
                                         ]
                                     },
                                     {
                                         title: "Pricing",
                                         colCount: 2,
                                         items: [
-                                            { dataField: "LandAppraisal" },
-                                            { dataField: "BuildingAppraisal" },
-                                            { dataField: "TotalAppraisal" },
-                                            { dataField: "TotalAssessment" },
+                                            { dataField: "LandAppraisal", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
+                                            { dataField: "BuildingAppraisal", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
+                                            { dataField: "TotalAppraisal", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
+                                            { dataField: "TotalAssessment", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
                                             { dataField: "LandUse" },
                                             { dataField: "YearBuilt" },
                                             { dataField: "Stories" },
                                             { dataField: "TotalRooms" },
                                             { dataField: "RecentDateOfSale" },
-                                            { dataField: "RecentSalesPrice" },
+                                            { dataField: "RecentSalesPrice", editorType: "dxNumberBox", editorOptions: { format: "currency" } },
                                             { dataField: "SecondRecentDateOfSale" },
-                                            { dataField: "SecondRecentSalesPrice" }
+                                            { dataField: "SecondRecentSalesPrice", editorType: "dxNumberBox", editorOptions: { format: "currency" } }
                                         ]
                                     },
                                     {
@@ -587,8 +659,8 @@ export default function ParcelGrid() {
                     <Column dataField="Notes" caption="Notes" dataType="string" width={250} />
                     <Column dataField="PermitStatus" caption="Permit Status" dataType="string" width={140} />
                     <Column dataField="LastDateToApply" caption="Last Date To Apply" dataType="date" width={150} />
-                    <Column dataField="Acreage" caption="Acreage" dataType="number" width={100} format={{ type: "fixedPoint", precision: 3 }}/>
-                    <Column dataField="SquareFoot" caption="Square Foot" dataType="number" width={120} format={{ type: "fixedPoint", precision: 0 }}/>
+                    <Column dataField="Acreage" caption="Acreage" dataType="number" width={100} format={{ type: "fixedPoint", precision: 3 }} />
+                    <Column dataField="SquareFoot" caption="Square Foot" dataType="number" width={120} format={{ type: "fixedPoint", precision: 0 }} />
                     <Column dataField="PropertyStatus" caption="Property Status" dataType="string" width={150} />
                     <Column dataField="PropertyClassification" caption="Property Classification" dataType="string" width={200} />
                     <Column dataField="Owner" caption="Owner" dataType="string" width={200} />
@@ -655,7 +727,7 @@ export default function ParcelGrid() {
                             );
                         }}
                     />
-                     <Column
+                    <Column
                         dataField="RegistryLink"
                         caption="Registry Link"
                         dataType="string"

@@ -5,7 +5,7 @@ import "./Parcel.css";
 import notify from "devextreme/ui/notify";
 import type dxDataGrid from "devextreme/ui/data_grid";
 import { useRef, useState } from "react";
-import type { EditingStartEvent, RowDblClickEvent } from "devextreme/ui/data_grid";
+import type { EditingStartEvent, RowDblClickEvent, RowPreparedEvent } from "devextreme/ui/data_grid";
 import "./ParcelEditBox.css";
 import HeaderProfile from "../Profile/Profile";
 import type { GroupItemTemplateData } from "devextreme/ui/form";
@@ -189,13 +189,8 @@ export default function ParcelGrid() {
             const start = new Date();
             start.setHours(0, 0, 0, 0);
 
-            const end = new Date();
-            end.setHours(23, 59, 59, 999);
-
             const dateFilter = [
-                ["LastDateToApply", ">=", start],
-                "and",
-                ["LastDateToApply", "<=", end]
+                ["LastDateToApply", ">=", start]
             ];
 
             if (filters.length) {
@@ -212,7 +207,25 @@ export default function ParcelGrid() {
         }
     };
 
+    const OnRowPrepared = (e: RowPreparedEvent<ParcelsDO, number>) => {
+        if (e.rowType !== "data") return;
 
+         e.rowElement.style.backgroundColor = "";
+         e.rowElement.style.fontWeight = "";
+
+        const parcel = e.data as ParcelsDO;
+
+        const appNo = parcel.ApplicationNumber;
+        const status = parcel.ApplicationStatus;
+
+        const hasAppNo = appNo !== null && appNo !== undefined && String(appNo).trim() !== "";
+        const hasStatus = status !== null && status !== undefined && String(status).trim() !== "";
+
+        if (hasAppNo && hasStatus) {
+            e.rowElement.style.backgroundColor = "#FBE2D5"; // light orange
+            //e.rowElement.style.fontWeight = "600"; // optional
+        }
+        };
 
     const onToolbarPreparing = (e: DataGridTypes.ToolbarPreparingEvent) => {
         e.toolbarOptions.items?.unshift(
@@ -302,7 +315,7 @@ export default function ParcelGrid() {
                     columnAutoWidth={true}
                     rowAlternationEnabled={true}
                     hoverStateEnabled={true}
-                    repaintChangesOnly={true}
+                    repaintChangesOnly={false}
                     allowColumnReordering={true}
                     allowColumnResizing={true}
                     columnResizingMode="widget"
@@ -313,6 +326,7 @@ export default function ParcelGrid() {
                     onRowDblClick={OnRowDoubleClick}
                     onEditingStart={OnEditingStart}
                     onToolbarPreparing={onToolbarPreparing}
+                    onRowPrepared={OnRowPrepared}
                 >
                     <Toolbar>
                         <Item name="searchPanel" location="before" />
@@ -415,7 +429,7 @@ export default function ParcelGrid() {
                                             { dataField: "BidOffDate", editorType: "dxDateBox" },
                                             { dataField: "LastDateToApply", editorType: "dxDateBox" },
                                             { dataField: "HasDemo" },
-                                            { dataField: "PermitStatus" },
+                                            { dataField: "LandUse" },
                                             { dataField: "PropertyStatus" },
                                             { dataField: "PropertyClassification" },
                                         ]
@@ -573,8 +587,8 @@ export default function ParcelGrid() {
                     <Column dataField="Notes" caption="Notes" dataType="string" width={250} />
                     <Column dataField="PermitStatus" caption="Permit Status" dataType="string" width={140} />
                     <Column dataField="LastDateToApply" caption="Last Date To Apply" dataType="date" width={150} />
-                    <Column dataField="Acreage" caption="Acreage" dataType="number" width={100} />
-                    <Column dataField="SquareFoot" caption="Square Foot" dataType="number" width={120} />
+                    <Column dataField="Acreage" caption="Acreage" dataType="number" width={100} format={{ type: "fixedPoint", precision: 3 }}/>
+                    <Column dataField="SquareFoot" caption="Square Foot" dataType="number" width={120} format={{ type: "fixedPoint", precision: 0 }}/>
                     <Column dataField="PropertyStatus" caption="Property Status" dataType="string" width={150} />
                     <Column dataField="PropertyClassification" caption="Property Classification" dataType="string" width={200} />
                     <Column dataField="Owner" caption="Owner" dataType="string" width={200} />
@@ -597,28 +611,67 @@ export default function ParcelGrid() {
                     <Column dataField="CompLimit" caption="Comp Limit" dataType="string" width={120} />
                     <Column dataField="AdDate" caption="Ad Date" dataType="date" width={120} />
                     <Column dataField="BidOffDate" caption="Bid Off Date" dataType="date" width={140} />
-                    <Column dataField="LandAppraisal" caption="Land Appraisal" dataType="number" width={130} />
-                    <Column dataField="BuildingAppraisal" caption="Building Appraisal" dataType="number" width={150} />
-                    <Column dataField="TotalAppraisal" caption="Total Appraisal" dataType="number" width={150} />
-                    <Column dataField="TotalAssessment" caption="TotalAssessment" dataType="number" width={150} />
+                    <Column dataField="LandAppraisal" caption="Land Appraisal" dataType="number" format="currency" width={130} />
+                    <Column dataField="BuildingAppraisal" caption="Building Appraisal" dataType="number" format="currency" width={150} />
+                    <Column dataField="TotalAppraisal" caption="Total Appraisal" dataType="number" format="currency" width={150} />
+                    <Column dataField="TotalAssessment" caption="TotalAssessment" dataType="number" format="currency" width={150} />
                     <Column dataField="LandUse" caption="Land Use" dataType="string" width={150} />
                     <Column dataField="YearBuilt" caption="Year Built" dataType="number" width={100} />
                     <Column dataField="Stories" caption="Stories" dataType="number" width={100} />
                     <Column dataField="TotalRooms" caption="Total Rooms" dataType="number" width={120} />
                     <Column dataField="RecentDateOfSale" caption="Recent Date Of Sale" dataType="date" width={150} />
-                    <Column dataField="RecentSalesPrice" caption="Recent Sales Price" dataType="number" width={150} />
+                    <Column dataField="RecentSalesPrice" caption="Recent Sales Price" dataType="number" format="currency" width={150} />
                     <Column dataField="SecondRecentDateOfSale" caption="Second Recent Date Of Sale" dataType="date" width={200} />
-                    <Column dataField="SecondRecentSalesPrice" caption="Second Recent Sales Price" dataType="number" width={200} />
-                    <Column dataField="AccessorLink" caption="Accessor Link" dataType="string" width={200} />
-                    <Column dataField="GisLink" caption="GIS Link" dataType="string" width={200} />
-                    <Column dataField="RegistryLink" caption="Registry Link" dataType="string" width={200} />
+                    <Column dataField="SecondRecentSalesPrice" caption="Second Recent Sales Price" dataType="number" format="currency" width={200} />
+                    <Column
+                        dataField="AccessorLink"
+                        caption="Accessor Link"
+                        dataType="string"
+                        width={200}
+                        cellRender={(cellData: any) => {
+                            const value = cellData?.value as string | undefined;
+                            if (!value) return <span />;
+                            const href = value.startsWith("http") ? value : `https://${value}`;
+                            return (
+                                <a href={href} target="_blank" rel="noopener noreferrer">
+                                    {value}
+                                </a>
+                            );
+                        }}
+                    />
+                    <Column
+                        dataField="GisLink"
+                        caption="GIS Link"
+                        dataType="string"
+                        width={200}
+                        cellRender={(cellData: any) => {
+                            const value = cellData?.value as string | undefined;
+                            if (!value) return <span />;
+                            const href = value.startsWith("http") ? value : `https://${value}`;
+                            return (
+                                <a href={href} target="_blank" rel="noopener noreferrer">
+                                    {value}
+                                </a>
+                            );
+                        }}
+                    />
+                     <Column
+                        dataField="RegistryLink"
+                        caption="Registry Link"
+                        dataType="string"
+                        width={200}
+                        cellRender={(cellData: any) => {
+                            const value = cellData?.value as string | undefined;
+                            if (!value) return <span />;
+                            const href = value.startsWith("http") ? value : `https://${value}`;
+                            return (
+                                <a href={href} target="_blank" rel="noopener noreferrer">
+                                    {value}
+                                </a>
+                            );
+                        }}
+                    />
                     <Summary >
-                        <TotalItem
-                            column="Acreage"
-                            summaryType="sum"
-                            valueFormat={{ type: "fixedPoint", precision: 3 }}
-                            displayFormat="Total Acreage: {0}"
-                        />
                         <TotalItem
                             column="AskingPrice"
                             summaryType="avg"
